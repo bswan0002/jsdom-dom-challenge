@@ -1,28 +1,19 @@
 let counter = 0;
 const seconds = document.getElementById("counter");
 
-//counter incrementing every second (1000ith millisec)
-let counterId = setInterval(function () {
+function increment() {
   seconds.innerHTML = counter++;
-}, 1000);
+}
 
-//manually + / - counter
+let timer = setInterval(increment, 1000);
+
 const plus = document.getElementById("plus");
 const minus = document.getElementById("minus");
 
-function addSecond() {
-  seconds.innerHTML = counter++;
-}
-
-function minusSecond() {
+function decrement() {
   seconds.innerHTML = counter--;
 }
 
-plus.addEventListener("click", addSecond);
-minus.addEventListener("click", minusSecond);
-
-//display likes
-// ❤️ 35 (2)
 const likesUl = document.querySelector(".likes");
 const heart = document.getElementById("heart");
 let heartsHash = {};
@@ -44,28 +35,51 @@ function addLike() {
   }
 }
 
-heart.addEventListener("click", addLike);
+// document.querySelector("div .comments").appendChild(document.createElement("ul"))
+const commentSubmit = document.getElementById("submit");
 
-//pause button
+function submitComment(e) {
+  e.preventDefault();
+  const commentInput = document.getElementById("comment-input");
+  const comments = document.getElementById("list");
+  let newComment = document.createElement("p");
+  newComment.innerText = commentInput.value;
+  comments.appendChild(newComment);
+  commentInput.value = "";
+}
+
+function preventReload(e) {
+  e.preventDefault();
+}
+
+function addListeners() {
+  plus.addEventListener("click", increment);
+  minus.addEventListener("click", decrement);
+  heart.addEventListener("click", addLike);
+  commentSubmit.addEventListener("click", submitComment);
+}
+
+function removeListeners() {
+  heart.removeEventListener("click", addLike);
+  plus.removeEventListener("click", increment);
+  minus.removeEventListener("click", decrement);
+  commentSubmit.removeEventListener("click", submitComment);
+  commentSubmit.addEventListener("click", preventReload);
+}
+
 const pause = document.getElementById("pause");
 
 pause.addEventListener("click", function () {
-  // if text on Pause button is pase => remove ALL event listeners
-  // else => reinstate all event listeners
   if (pause.innerText === "pause") {
-    clearInterval(counterId);
+    clearInterval(timer);
     pause.innerText = "resume";
-    heart.removeEventListener("click", addLike);
-    plus.removeEventListener("click", addSecond);
-    minus.removeEventListener("click", minusSecond);
+    removeListeners();
   } else {
-    setInterval(function () {
-      seconds.innerHTML = counter++;
-    }, 1000);
-    counterId++;
+    timer = setInterval(increment, 1000);
     pause.innerText = "pause";
-    heart.addEventListener("click", addLike);
-    plus.addEventListener("click", addSecond);
-    minus.addEventListener("click", minusSecond);
+    commentSubmit.removeEventListener("click", preventReload);
+    addListeners();
   }
 });
+
+document.addEventListener("DOMContentLoaded", addListeners);
